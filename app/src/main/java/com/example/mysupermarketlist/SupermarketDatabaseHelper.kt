@@ -10,7 +10,7 @@ class SupermarketDatabaseHelper(private val mainActivity: MainActivity) {
 
     val dbHelper = SupermarketDbHelper(mainActivity)
 
-    fun addToDatabase(title: String){
+    fun addToDatabase(title: String, isOther: Boolean){
         //Gets the data repository in write mode
         val db = dbHelper.writableDatabase
 
@@ -18,6 +18,7 @@ class SupermarketDatabaseHelper(private val mainActivity: MainActivity) {
         val values = ContentValues().apply {
             put(SupermarketList.SupermarketEntry.COLUMMN_NAME_TITLE, title)
             put(SupermarketList.SupermarketEntry.COLUMN_NAME_ISCHECKED, false)
+            put(SupermarketList.SupermarketEntry.COLUMN_NAME_ISFIRST, isOther)
         }
 
         //Insert the new row, returning the primary key value of the new row
@@ -27,7 +28,24 @@ class SupermarketDatabaseHelper(private val mainActivity: MainActivity) {
     fun readFromDatabase() : MutableList<ListAdapter.ListItem> {
         val db = dbHelper.readableDatabase
 
-        val cursor = db.rawQuery("SELECT * FROM " + SupermarketList.SupermarketEntry.TABLE_NAME, null)
+        val cursor = db.rawQuery("SELECT * FROM " + SupermarketList.SupermarketEntry.TABLE_NAME + " WHERE " + SupermarketList.SupermarketEntry.COLUMN_NAME_ISFIRST + " =true", null)
+
+        val items = mutableListOf<ListAdapter.ListItem>()
+        while(cursor.moveToNext()){
+            val title: String = cursor.getString(0)
+            val isChecked: Boolean = java.lang.Boolean.valueOf(cursor.getString(1))
+
+            items.add(ListAdapter.ListItem(title, isChecked))
+        }
+        cursor.close()
+
+        return items
+    }
+
+    fun readFromDatabaseOther() : MutableList<ListAdapter.ListItem> {
+        val db = dbHelper.readableDatabase
+
+        val cursor = db.rawQuery("SELECT * FROM " + SupermarketList.SupermarketEntry.TABLE_NAME + " WHERE " + SupermarketList.SupermarketEntry.COLUMN_NAME_ISFIRST + " =false", null)
 
         val items = mutableListOf<ListAdapter.ListItem>()
         while(cursor.moveToNext()){
@@ -67,6 +85,7 @@ class SupermarketDatabaseHelper(private val mainActivity: MainActivity) {
             const val TABLE_NAME = "supermarket"
             const val COLUMMN_NAME_TITLE = "title"
             const val COLUMN_NAME_ISCHECKED = "ischecked"
+            const val COLUMN_NAME_ISFIRST = "isfirst"
         }
     }
 
@@ -74,7 +93,8 @@ class SupermarketDatabaseHelper(private val mainActivity: MainActivity) {
         override fun onCreate(db: SQLiteDatabase){
             val sqlCreateEntries = "CREATE TABLE ${SupermarketList.SupermarketEntry.TABLE_NAME} (" +
                     "${SupermarketList.SupermarketEntry.COLUMMN_NAME_TITLE} TEXT," +
-                    "${SupermarketList.SupermarketEntry.COLUMN_NAME_ISCHECKED} BOOLEAN)"
+                    "${SupermarketList.SupermarketEntry.COLUMN_NAME_ISCHECKED} BOOLEAN," +
+                    "${SupermarketList.SupermarketEntry.COLUMN_NAME_ISFIRST} BOOLEAN)"
 
             db.execSQL(sqlCreateEntries)
         }
