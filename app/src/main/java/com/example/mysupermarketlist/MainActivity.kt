@@ -5,8 +5,11 @@ import android.os.Bundle
 import android.view.inputmethod.InputMethodManager
 import android.widget.CheckBox
 import android.widget.EditText
+import android.widget.ImageView
+import android.widget.LinearLayout
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -25,12 +28,11 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        var dataset = databaseHelper.readFromDatabase()
-        val listAdapter = ListAdapter(dataset, listener)
+        var isOtherTabOpen = true
 
-        val recyclerView: RecyclerView = findViewById(R.id.recycler_first)
-        recyclerView.layoutManager = LinearLayoutManager(this)
-        recyclerView.adapter = listAdapter
+        val pair = initFirstRecyclerView(listener)
+        val dataset = pair.first
+        val listAdapter = pair.second
 
         var datasetSecond = databaseHelper.readFromDatabaseOther()
         val listAdapterSecond = ListAdapter(datasetSecond, listener)
@@ -39,21 +41,58 @@ class MainActivity : AppCompatActivity() {
         recyclerViewSecond.layoutManager = LinearLayoutManager(this)
         recyclerViewSecond.adapter = listAdapterSecond
 
+        val arrowImageView = findViewById<ImageView>(R.id.imageview_arrow)
+
+        val secondLinearLayout = findViewById<LinearLayout>(R.id.linearlayout_second)
+        secondLinearLayout.setOnClickListener{ v ->
+            if(isOtherTabOpen){
+                arrowImageView.setImageDrawable(getDrawable(R.drawable.ic_arrow_down))
+            }
+            else{
+                arrowImageView.setImageDrawable(getDrawable(R.drawable.ic_arrow_up))
+            }
+
+            isOtherTabOpen = !isOtherTabOpen
+
+            recyclerViewSecond.isVisible = isOtherTabOpen
+        }
+
+        initFabs(dataset, listAdapter, datasetSecond, listAdapterSecond)
+    }
+
+    private fun initFabs(
+        dataset: MutableList<ListAdapter.ListItem>,
+        listAdapter: ListAdapter,
+        datasetSecond: MutableList<ListAdapter.ListItem>,
+        listAdapterSecond: ListAdapter
+    ) {
+        var dataset1 = dataset
+        var datasetSecond1 = datasetSecond
         val fabAdd: FloatingActionButton = findViewById(R.id.fab_add)
-        fabAdd.setOnClickListener{
-            onAddClick(dataset, listAdapter, datasetSecond, listAdapterSecond)
+        fabAdd.setOnClickListener {
+            onAddClick(dataset1, listAdapter, datasetSecond1, listAdapterSecond)
         }
 
         val fabDelete: FloatingActionButton = findViewById(R.id.fab_delete)
-        fabDelete.setOnClickListener{
+        fabDelete.setOnClickListener {
             databaseHelper.deleteFromDatabase()
 
-            dataset = databaseHelper.readFromDatabase()
-            datasetSecond = databaseHelper.readFromDatabaseOther()
+            dataset1 = databaseHelper.readFromDatabase()
+            datasetSecond1 = databaseHelper.readFromDatabaseOther()
 
-            listAdapter.updateAdapter(dataset)
-            listAdapterSecond.updateAdapter((datasetSecond))
+            listAdapter.updateAdapter(dataset1)
+            listAdapterSecond.updateAdapter((datasetSecond1))
         }
+    }
+
+    private fun initFirstRecyclerView(listener: OnItemClickListener): Pair<MutableList<ListAdapter.ListItem>, ListAdapter> {
+        var dataset = databaseHelper.readFromDatabase()
+        val listAdapter = ListAdapter(dataset, listener)
+
+        val recyclerView: RecyclerView = findViewById(R.id.recycler_first)
+        recyclerView.layoutManager = LinearLayoutManager(this)
+        recyclerView.adapter = listAdapter
+        return Pair(dataset, listAdapter)
     }
 
     private fun onAddClick(dataset: MutableList<ListAdapter.ListItem>, listAdapter: ListAdapter, datasetSecond: MutableList<ListAdapter.ListItem>, listAdapterSecond: ListAdapter) {
