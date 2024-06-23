@@ -40,26 +40,33 @@
         android:id="@+id/recycler_second"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/linearlayout_second"/>
+        android:layout_below="@id/linearlayout_second"
+        android:layout_above="@+id/relativelayout_fab"/>
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_add"
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:id="@+id/relativelayout_fab"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:src="@drawable/baseline_add_24"
-        android:scaleType="center"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:layout_margin="20dp"/>
+        android:orientation="horizontal"
+        android:layout_alignParentBottom="true">
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_delete"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_trash"
-        android:scaleType="center"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="false"
-        android:layout_margin="20dp"/>
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab_add"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/baseline_add_24"
+            android:scaleType="center"
+            android:layout_alignParentEnd="true"
+            android:layout_margin="20dp"/>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab_delete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_trash"
+            android:scaleType="center"
+            android:layout_alignParentEnd="false"
+            android:layout_margin="20dp"/>
+    </RelativeLayout>
 
 </RelativeLayout>

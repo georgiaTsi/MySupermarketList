@@ -86,7 +86,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initFirstRecyclerView(listener: OnItemClickListener): Pair<MutableList<ListAdapter.ListItem>, ListAdapter> {
-        var dataset = databaseHelper.readFromDatabase()
+        val dataset = databaseHelper.readFromDatabase()
         val listAdapter = ListAdapter(dataset, listener)
 
         val recyclerView: RecyclerView = findViewById(R.id.recycler_first)
@@ -105,7 +105,7 @@ class MainActivity : AppCompatActivity() {
             .setView(view)
             .setPositiveButton("OK") { dialog, _ ->
                 if (editText.text.toString().isNotEmpty()) {
-                    databaseHelper.addToDatabase(editText.text.toString(), checkBox.isChecked)
+                    databaseHelper.addToDatabase(editText.text.toString(), !checkBox.isChecked)
 
                     if(!checkBox.isChecked) {
                         dataset.add(dataset.size, ListAdapter.ListItem(editText.text.toString(), false))
